@@ -8,7 +8,17 @@
 #include <iostream>
 #include <string>
 
-class Entidade {
+
+//A classe abaixo é chamada de Abstrata, pois todos os seus metodos sao FuncoesVirtuaisPuras(ou seja, sao funcoes sem implementacao) que obrigam
+// que as classes filhas de 'Imprimivel' implementem todas os metodos/FuncoesVirtuaisPuras para que tais classes ilhas possam ser instanciadas.
+class Imprimivel {
+public:
+    //Colocar no metodo abaixo 'virtual' e '=0;' o transforma em FuncoesVirtualPura, impedindo instanciacao dos filho q n implementarem esse metodo
+    virtual std::string GetNomeDaClasse() =0;
+};
+
+
+class Entidade:public Imprimivel {
 public:
     
     std::string GetNome() {
@@ -20,7 +30,16 @@ public:
     virtual std::string GetNomeVirtualizado() {
         return "Entidade";
     }
+    //Repare(faça o teste) que na linha abaixo: mesmo removendo o 'override' ainda funcionara, mas mesmo assim é uma boa pratica escrever pois:
+    // 1) Quem ler esse codigo saibera que o metodo da classe pai é Virtual. 2) Ajuda a resolver bugs durante a criacao da mesma, visto que
+    // o compilador alertara o desenvolvedor caso 'o metodo que voce escreve nao tem exatamente o mesmo nome que o metodo pai', ou se por exemplo
+    // 'o metodo da classe pai nao esta escrito como 'virtual'.
+    std::string GetNomeDaClasse() override {
+        return "Entidade";
+    }
 };
+
+
 
 class Jogador:public Entidade {
 private:
@@ -40,16 +59,24 @@ public:
     std::string GetNomeVirtualizado() override {
         return m_Nome;
     }
-    
+    std::string GetNomeDaClasse() override {
+        return m_Nome;
+    }
 };
+
+
 
 void PrintNome(Entidade* entidade) { //O argumento que for passado para este metodo sera interpretado como a classe 'Entidade'
     std::cout << entidade->GetNome() << "\n" << std::endl;
 }
-
 void PrintNomeVirtualizado(Entidade* entidade) { //O argumento que for passado para este metodo sera interpretado como a classe 'Entidade'
     std::cout << entidade->GetNomeVirtualizado() << "\n" << std::endl;
 }
+void Print(Imprimivel* obj) {
+    std::cout << obj->GetNomeDaClasse() << std::endl;
+}
+
+
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -70,7 +97,6 @@ int main(int argc, const char * argv[]) {
     PrintNome(j);
     
     std::cout << " ----- Resolvendo os problemas acima com Funcao Virtual --------\n";
-    
     //Para evitar que o que ocorreu acima aconteca, existe uma coisa chamada 'Vtable', que basicamente consiste de definir como virtual
     // o metodo em sobrescrita/overide (nesse caso "GetNome()") na classe paiDeTodos(Ou seja, a classe que esta acima de todo como 'pai,neto..',
     // e nesse caso é Entidade).
@@ -80,6 +106,13 @@ int main(int argc, const char * argv[]) {
     //1) Armazenar(consumir) na memoria a 'Vtable'
     //2) Custo de performance, pois toda vez que esse metodo for chamado havara o trabalho de ir na tabela consultar qual metodo sera chamado
     //Para o Chermo isso nunca fez diferenca para ele em termos de custo computacional, e ele usa o tempo todo.
+    
+    std::cout << " ---------------------- Usando FuncoesVirtuaisPuras ----------------------\n";
+    //Basicamente consite de metodos sem implementacao()ou seja, apenas contem a declaracao. E elas servem para obrigar que as classes filhas
+    // implementem as mesmas. Por exemplo, repare nao faz sentido o metodo 'GetNome()' da classe 'Entidade' ter uma implementacao, pois apenas
+    // queremos que ela exista para que seja cliada pelas classes filhas. Veja exemplos de seu uso:
+    Print(e);
+    Print(j);
     
     
     return 0;
